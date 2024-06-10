@@ -23,6 +23,18 @@ Learning rust.
 Hopefully will have a terminal tamagotchi because tamagotchis 
 are expensive and crabs are free if you are near an ocean.
 
+## Dev
+Get Rust
+```
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+Clone this repo, cd into it and run
+```
+cargo run
+```
+
+
+
 
 
 
