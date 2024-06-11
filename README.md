@@ -32,6 +32,18 @@ Clone this repo, cd into it and run
 ```
 cargo run
 ```
+## TODO
+- [ ] forge the krab (animate)
+- [ ] make the krab do stuff
+- [ ] have krab stats 
+- [ ] feed the  krab
+- [ ] train the krab
+- [ ] pet the krab 
+- [ ] mini game for krab
+- [ ] think of things krab can do 
+- [ ] think about *maybe* implementing lobsters 
+
+
 
 
 
