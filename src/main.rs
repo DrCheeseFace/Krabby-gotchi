@@ -64,8 +64,8 @@ impl App {
         let horizontal =
             Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]);
         let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let [status, right] = horizontal.areas(frame.size());
-        let [krab, buttons] = vertical.areas(right);
+        let [krab, right] = vertical.areas(frame.size());
+        let [status, buttons] = horizontal.areas(right);
 
         frame.render_widget(self.krab_canvas(), krab);
         frame.render_widget(self.status_canvas(), status);
