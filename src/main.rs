@@ -2,10 +2,10 @@ use clap::Parser;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     prelude::*,
-    symbols::border,
     widgets::{block::*, *},
 };
 use std::io;
+use std::time::{Duration, Instant};
 
 mod tui;
 
@@ -19,10 +19,12 @@ struct Args {
     /// name the crab
     #[arg(short, long, default_value = "Eugene Krabs")]
     name: String,
+}
 
-    /// number of times to repeat
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+#[derive(Debug, Default)]
+pub struct App {
+    exit: bool,
+    tick_count: u64,
 }
 
 fn main() -> io::Result<()> {
@@ -32,23 +34,59 @@ fn main() -> io::Result<()> {
     app_result
 }
 
-#[derive(Debug, Default)]
-pub struct App {
-    counter: u8,
-    exit: bool,
-}
-
 impl App {
+    fn new() -> Self {
+        Self {
+            exit: false,
+            tick_count: 0,
+        }
+    }
+
     pub fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
+        let mut last_tick = Instant::now();
+        let mut tick_rate = Duration::from_millis(100);
+        let mut app = Self::new();
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
-            self.handle_events()?;
+            let timeout = tick_rate.saturating_sub(last_tick.elapsed());
+            if event::poll(timeout).unwrap() {
+                self.handle_events()?;
+            }
+            if last_tick.elapsed() >= tick_rate {
+                last_tick = Instant::now();
+                self.on_tick()?;
+            }
         }
         Ok(())
     }
+
     fn render_frame(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.size());
+        let horizontal =
+            Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]);
+        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
+        let [krab, right] = vertical.areas(frame.size());
+        let [status, buttons] = horizontal.areas(right);
+
+        frame.render_widget(self.krab_canvas(), krab);
+        frame.render_widget(self.status_canvas(), status);
+        frame.render_widget(self.buttons_canvas(), buttons);
     }
+
+    fn status_canvas(&self) -> impl Widget + '_ {
+        Paragraph::new("status/stats?").block(Block::new().borders(Borders::ALL))
+    }
+    fn krab_canvas(&self) -> impl Widget + '_ {
+        Paragraph::new("Krab go here").block(Block::new().borders(Borders::ALL))
+    }
+    fn buttons_canvas(&self) -> impl Widget + '_ {
+        Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL))
+    }
+
+    fn on_tick(&mut self) -> io::Result<()> {
+        self.tick_count += 1;
+        Ok(())
+    }
+
     fn handle_events(&mut self) -> io::Result<()> {
         match event::read()? {
             Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
@@ -62,57 +100,12 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
-            KeyCode::Left => self.decrement_counter(),
-            KeyCode::Right => self.increment_counter(),
             _ => {}
         }
     }
 
     fn exit(&mut self) {
         self.exit = true;
-    }
-
-    fn increment_counter(&mut self) {
-        self.counter += 1;
-    }
-
-    fn decrement_counter(&mut self) {
-        self.counter -= 1;
-    }
-}
-
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let args = Args::parse();
-        let title = Title::from(args.name);
-        let instructions = Title::from(Line::from(vec![
-            " Decrement ".into(),
-            "<Left>".blue().bold(),
-            " Increment ".into(),
-            "<Right>".blue().bold(),
-            " Quit ".into(),
-            "<Q> ".blue().bold(),
-        ]));
-        let block = Block::default()
-            .title(title.alignment(Alignment::Center))
-            .title(
-                instructions
-                    .alignment(Alignment::Center)
-                    .position(Position::Bottom),
-            )
-            .borders(Borders::ALL)
-            .border_set(border::THICK);
-
-        let mut krabtext: String = "".to_string();
-        for _ in 0..self.counter {
-            krabtext.push_str("🦀");
-        }
-        let krabs = Text::from(vec![Line::from(vec!["Value: ".into(), krabtext.into()])]);
-
-        Paragraph::new(krabs)
-            .centered()
-            .block(block)
-            .render(area, buf);
     }
 }
 
