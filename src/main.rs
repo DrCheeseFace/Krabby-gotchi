@@ -25,27 +25,29 @@ struct Args {
 pub struct App {
     exit: bool,
     tick_count: u64,
+    name: String,
 }
 
 fn main() -> io::Result<()> {
     let mut terminal = tui::init()?;
-    let app_result = App::default().run(&mut terminal);
+    let mut app = App::new(Args::parse().name);
+    let app_result = app.run(&mut terminal);
     tui::restore()?;
     app_result
 }
 
 impl App {
-    fn new() -> Self {
+    fn new(name: String) -> Self {
         Self {
             exit: false,
             tick_count: 0,
+            name,
         }
     }
 
     pub fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
         let mut last_tick = Instant::now();
         let mut tick_rate = Duration::from_millis(100);
-        let mut app = Self::new();
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
             let timeout = tick_rate.saturating_sub(last_tick.elapsed());
@@ -76,7 +78,7 @@ impl App {
         Paragraph::new("status/stats?").block(Block::new().borders(Borders::ALL))
     }
     fn krab_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new("Krab go here").block(Block::new().borders(Borders::ALL))
+        Paragraph::new(self.name.clone()).block(Block::new().borders(Borders::ALL))
     }
     fn buttons_canvas(&self) -> impl Widget + '_ {
         Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL))
