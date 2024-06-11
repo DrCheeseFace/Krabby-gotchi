@@ -47,7 +47,7 @@ impl App {
 
     pub fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
         let mut last_tick = Instant::now();
-        let mut tick_rate = Duration::from_millis(100);
+        let tick_rate = Duration::from_millis(100);
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
             let timeout = tick_rate.saturating_sub(last_tick.elapsed());
