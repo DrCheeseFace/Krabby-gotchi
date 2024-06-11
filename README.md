@@ -42,6 +42,7 @@ cargo run
 - [ ] mini game for krab
 - [ ] think of things krab can do 
 - [ ] think about *maybe* implementing lobsters 
+- [ ] saving and config 
 
 
 
