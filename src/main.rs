@@ -2,7 +2,6 @@ use clap::Parser;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
     prelude::*,
-    symbols::border,
     widgets::{block::*, *},
 };
 use std::io;
@@ -19,10 +18,11 @@ struct Args {
     /// name the crab
     #[arg(short, long, default_value = "Eugene Krabs")]
     name: String,
+}
 
-    /// number of times to repeat
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
+#[derive(Debug, Default)]
+pub struct App {
+    exit: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -30,12 +30,6 @@ fn main() -> io::Result<()> {
     let app_result = App::default().run(&mut terminal);
     tui::restore()?;
     app_result
-}
-
-#[derive(Debug, Default)]
-pub struct App {
-    counter: u8,
-    exit: bool,
 }
 
 impl App {
@@ -47,7 +41,28 @@ impl App {
         Ok(())
     }
     fn render_frame(&self, frame: &mut Frame) {
-        frame.render_widget(self, frame.size());
+        let top_layout = Layout::default()
+            .direction(Direction::Vertical)
+            .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
+            .split(frame.size());
+
+        let bottom_layout = Layout::default()
+            .direction(Direction::Horizontal)
+            .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
+            .split(top_layout[1]);
+
+        frame.render_widget(
+            Paragraph::new("Krab go here").block(Block::new().borders(Borders::ALL)),
+            top_layout[0],
+        );
+        frame.render_widget(
+            Paragraph::new("status/stats?").block(Block::new().borders(Borders::ALL)),
+            bottom_layout[0],
+        );
+        frame.render_widget(
+            Paragraph::new("buttons").block(Block::new().borders(Borders::ALL)),
+            bottom_layout[1],
+        );
     }
     fn handle_events(&mut self) -> io::Result<()> {
         match event::read()? {
@@ -62,57 +77,12 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
-            KeyCode::Left => self.decrement_counter(),
-            KeyCode::Right => self.increment_counter(),
             _ => {}
         }
     }
 
     fn exit(&mut self) {
         self.exit = true;
-    }
-
-    fn increment_counter(&mut self) {
-        self.counter += 1;
-    }
-
-    fn decrement_counter(&mut self) {
-        self.counter -= 1;
-    }
-}
-
-impl Widget for &App {
-    fn render(self, area: Rect, buf: &mut Buffer) {
-        let args = Args::parse();
-        let title = Title::from(args.name);
-        let instructions = Title::from(Line::from(vec![
-            " Decrement ".into(),
-            "<Left>".blue().bold(),
-            " Increment ".into(),
-            "<Right>".blue().bold(),
-            " Quit ".into(),
-            "<Q> ".blue().bold(),
-        ]));
-        let block = Block::default()
-            .title(title.alignment(Alignment::Center))
-            .title(
-                instructions
-                    .alignment(Alignment::Center)
-                    .position(Position::Bottom),
-            )
-            .borders(Borders::ALL)
-            .border_set(border::THICK);
-
-        let mut krabtext: String = "".to_string();
-        for _ in 0..self.counter {
-            krabtext.push_str("🦀");
-        }
-        let krabs = Text::from(vec![Line::from(vec!["Value: ".into(), krabtext.into()])]);
-
-        Paragraph::new(krabs)
-            .centered()
-            .block(block)
-            .render(area, buf);
     }
 }
 
