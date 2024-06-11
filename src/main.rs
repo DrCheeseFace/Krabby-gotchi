@@ -123,7 +123,9 @@ impl App {
     fn on_tick(&mut self) -> io::Result<()> {
         self.krab.age += 1;
         self.tick_count += 1;
-        self.save();
+        if self.tick_count % 600 == 0 {
+            self.save();
+        }
         Ok(())
     }
 
@@ -149,7 +151,7 @@ impl App {
     }
 
     fn save(&self) {
-        let save_krab = save_file("krabby-gotchi.save", 0,  &self.krab);
+        let save_krab = save_file("krabby-gotchi.save", 0, &self.krab);
         match save_krab {
             Ok(_) => {}
             Err(_) => {
@@ -159,7 +161,7 @@ impl App {
     }
 
     fn load_save(&mut self) {
-        let loaded_krab =load_file::<Krab, &str>("krabby-gotchi.save", 0);
+        let loaded_krab = load_file::<Krab, &str>("krabby-gotchi.save", 0);
         match loaded_krab {
             Ok(_) => {
                 self.krab = loaded_krab.unwrap();
