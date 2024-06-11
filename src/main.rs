@@ -1,3 +1,8 @@
+extern crate savefile;
+use savefile::prelude::*;
+#[macro_use]
+extern crate savefile_derive;
+
 use clap::Parser;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{
@@ -6,7 +11,6 @@ use ratatui::{
 };
 use std::io;
 use std::time::{Duration, Instant};
-
 mod tui;
 
 #[derive(Parser, Debug)]
@@ -21,11 +25,41 @@ struct Args {
     name: String,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct App {
     exit: bool,
     tick_count: u64,
     name: String,
+    krab: Krab,
+}
+
+#[derive(Debug, Savefile)]
+struct Krab {
+    name: String,
+    hunger: u8,
+    happiness: u8,
+    health: u8,
+    age: u64,
+    weight: u8,
+    size: u8,
+    mood: String,
+    status: String,
+}
+
+impl Krab {
+    fn new(name: String) -> Self {
+        Self {
+            name,
+            hunger: 0,
+            happiness: 0,
+            health: 0,
+            age: 0,
+            weight: 0,
+            size: 0,
+            mood: String::from("neutral"),
+            status: String::from("alive"),
+        }
+    }
 }
 
 fn main() -> io::Result<()> {
@@ -42,12 +76,14 @@ impl App {
             exit: false,
             tick_count: 0,
             name,
+            krab: Krab::new("Eugene Krabs".to_string()),
         }
     }
 
     pub fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
         let mut last_tick = Instant::now();
         let tick_rate = Duration::from_millis(100);
+        self.load_save();
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
             let timeout = tick_rate.saturating_sub(last_tick.elapsed());
@@ -75,7 +111,7 @@ impl App {
     }
 
     fn status_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new("status/stats?").block(Block::new().borders(Borders::ALL))
+        Paragraph::new(self.krab.age.to_string()).block(Block::new().borders(Borders::ALL))
     }
     fn krab_canvas(&self) -> impl Widget + '_ {
         Paragraph::new(self.name.clone()).block(Block::new().borders(Borders::ALL))
@@ -85,7 +121,9 @@ impl App {
     }
 
     fn on_tick(&mut self) -> io::Result<()> {
+        self.krab.age += 1;
         self.tick_count += 1;
+        self.save();
         Ok(())
     }
 
@@ -108,6 +146,30 @@ impl App {
 
     fn exit(&mut self) {
         self.exit = true;
+    }
+
+    fn save(&self) {
+        let save_krab = save_file("krabby-gotchi.save", 0,  &self.krab);
+        match save_krab {
+            Ok(_) => {}
+            Err(_) => {
+                println!("Failed to save");
+            }
+        }
+    }
+
+    fn load_save(&mut self) {
+        let loaded_krab =load_file::<Krab, &str>("krabby-gotchi.save", 0);
+        match loaded_krab {
+            Ok(_) => {
+                self.krab = loaded_krab.unwrap();
+            }
+            Err(_) => {
+                let newkrab = Krab::new("Eugene Krabs".to_string());
+                self.krab = newkrab;
+                self.save();
+            }
+        }
     }
 }
 
