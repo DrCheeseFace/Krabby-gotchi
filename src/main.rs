@@ -61,28 +61,25 @@ impl App {
     }
 
     fn render_frame(&self, frame: &mut Frame) {
-        let top_layout = Layout::default()
-            .direction(Direction::Vertical)
-            .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
-            .split(frame.size());
+        let horizontal =
+            Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]);
+        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
+        let [status, right] = horizontal.areas(frame.size());
+        let [krab, buttons] = vertical.areas(right);
 
-        let bottom_layout = Layout::default()
-            .direction(Direction::Horizontal)
-            .constraints(vec![Constraint::Percentage(50), Constraint::Percentage(50)])
-            .split(top_layout[1]);
+        frame.render_widget(self.krab_canvas(), krab);
+        frame.render_widget(self.status_canvas(), status);
+        frame.render_widget(self.buttons_canvas(), buttons);
+    }
 
-        frame.render_widget(
-            Paragraph::new("Krab go here").block(Block::new().borders(Borders::ALL)),
-            top_layout[0],
-        );
-        frame.render_widget(
-            Paragraph::new("status/stats?").block(Block::new().borders(Borders::ALL)),
-            bottom_layout[0],
-        );
-        frame.render_widget(
-            Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL)),
-            bottom_layout[1],
-        );
+    fn status_canvas(&self) -> impl Widget + '_ {
+        Paragraph::new("status/stats?").block(Block::new().borders(Borders::ALL))
+    }
+    fn krab_canvas(&self) -> impl Widget + '_ {
+        Paragraph::new("Krab go here").block(Block::new().borders(Borders::ALL))
+    }
+    fn buttons_canvas(&self) -> impl Widget + '_ {
+        Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL))
     }
 
     fn on_tick(&mut self) -> io::Result<()> {
