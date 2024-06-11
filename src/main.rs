@@ -5,6 +5,7 @@ use ratatui::{
     widgets::{block::*, *},
 };
 use std::io;
+use std::time::{Duration, Instant};
 
 mod tui;
 
@@ -23,6 +24,7 @@ struct Args {
 #[derive(Debug, Default)]
 pub struct App {
     exit: bool,
+    tick_count: u64,
 }
 
 fn main() -> io::Result<()> {
@@ -33,13 +35,31 @@ fn main() -> io::Result<()> {
 }
 
 impl App {
+    fn new() -> Self {
+        Self {
+            exit: false,
+            tick_count: 0,
+        }
+    }
+
     pub fn run(&mut self, terminal: &mut tui::Tui) -> io::Result<()> {
+        let mut last_tick = Instant::now();
+        let mut tick_rate = Duration::from_millis(100);
+        let mut app = Self::new();
         while !self.exit {
             terminal.draw(|frame| self.render_frame(frame))?;
-            self.handle_events()?;
+            let timeout = tick_rate.saturating_sub(last_tick.elapsed());
+            if event::poll(timeout).unwrap() {
+                self.handle_events()?;
+            }
+            if last_tick.elapsed() >= tick_rate {
+                last_tick = Instant::now();
+                self.on_tick()?;
+            }
         }
         Ok(())
     }
+
     fn render_frame(&self, frame: &mut Frame) {
         let top_layout = Layout::default()
             .direction(Direction::Vertical)
@@ -60,10 +80,16 @@ impl App {
             bottom_layout[0],
         );
         frame.render_widget(
-            Paragraph::new("buttons").block(Block::new().borders(Borders::ALL)),
+            Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL)),
             bottom_layout[1],
         );
     }
+
+    fn on_tick(&mut self) -> io::Result<()> {
+        self.tick_count += 1;
+        Ok(())
+    }
+
     fn handle_events(&mut self) -> io::Result<()> {
         match event::read()? {
             Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
