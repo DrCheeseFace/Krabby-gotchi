@@ -11,8 +11,8 @@ use ratatui::{
 };
 use std::io;
 use std::time::{Duration, Instant};
-mod tui;
 mod krab;
+mod tui;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -33,7 +33,6 @@ pub struct App {
     krab: krab::Krab,
 }
 
-
 fn main() -> io::Result<()> {
     let mut terminal = tui::init()?;
     let mut app = App::new(Args::parse().name.clone());
@@ -47,7 +46,7 @@ impl App {
         Self {
             exit: false,
             tick_count: 0,
-            krab: krab::Krab::new(name.clone())
+            krab: krab::Krab::new(name.clone()),
         }
     }
 
@@ -145,4 +144,3 @@ impl App {
         }
     }
 }
-
