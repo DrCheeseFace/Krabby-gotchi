@@ -12,6 +12,7 @@ use ratatui::{
 use std::io;
 use std::time::{Duration, Instant};
 mod tui;
+mod krab;
 
 #[derive(Parser, Debug)]
 #[command(
@@ -29,42 +30,13 @@ struct Args {
 pub struct App {
     exit: bool,
     tick_count: u64,
-    name: String,
-    krab: Krab,
+    krab: krab::Krab,
 }
 
-#[derive(Debug, Savefile)]
-struct Krab {
-    name: String,
-    hunger: u8,
-    happiness: u8,
-    health: u8,
-    age: u64,
-    weight: u8,
-    size: u8,
-    mood: String,
-    status: String,
-}
-
-impl Krab {
-    fn new(name: String) -> Self {
-        Self {
-            name,
-            hunger: 0,
-            happiness: 0,
-            health: 0,
-            age: 0,
-            weight: 0,
-            size: 0,
-            mood: String::from("neutral"),
-            status: String::from("alive"),
-        }
-    }
-}
 
 fn main() -> io::Result<()> {
     let mut terminal = tui::init()?;
-    let mut app = App::new(Args::parse().name);
+    let mut app = App::new(Args::parse().name.clone());
     let app_result = app.run(&mut terminal);
     tui::restore()?;
     app_result
@@ -75,8 +47,7 @@ impl App {
         Self {
             exit: false,
             tick_count: 0,
-            name,
-            krab: Krab::new("Eugene Krabs".to_string()),
+            krab: krab::Krab::new(name.clone())
         }
     }
 
@@ -111,17 +82,17 @@ impl App {
     }
 
     fn status_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.krab.age.to_string()).block(Block::new().borders(Borders::ALL))
+        Paragraph::new(self.krab.age().to_string()).block(Block::new().borders(Borders::ALL))
     }
     fn krab_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.name.clone()).block(Block::new().borders(Borders::ALL))
+        Paragraph::new(self.krab.name().clone()).block(Block::new().borders(Borders::ALL))
     }
     fn buttons_canvas(&self) -> impl Widget + '_ {
         Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL))
     }
 
     fn on_tick(&mut self) -> io::Result<()> {
-        self.krab.age += 1;
+        self.krab.grow_older();
         self.tick_count += 1;
         if self.tick_count % 600 == 0 {
             self.save();
@@ -161,13 +132,13 @@ impl App {
     }
 
     fn load_save(&mut self) {
-        let loaded_krab = load_file::<Krab, &str>("krabby-gotchi.save", 0);
+        let loaded_krab = load_file::<krab::Krab, &str>("krabby-gotchi.save", 0);
         match loaded_krab {
             Ok(_) => {
                 self.krab = loaded_krab.unwrap();
             }
             Err(_) => {
-                let newkrab = Krab::new("Eugene Krabs".to_string());
+                let newkrab = krab::Krab::new(Args::parse().name.clone());
                 self.krab = newkrab;
                 self.save();
             }
@@ -175,10 +146,3 @@ impl App {
     }
 }
 
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn strokethatthangcuzzo() {
-        assert_eq!(true, 1 == 1);
-    }
-}
