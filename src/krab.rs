@@ -32,6 +32,7 @@ impl Krab {
     }
 
     //getters
+    #[warn(dead_code)]
     pub fn size(&self) -> &u8 {
         &self.size
     }

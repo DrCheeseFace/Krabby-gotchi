@@ -33,6 +33,7 @@ Clone this repo, cd into it and run
 cargo run
 ```
 ## TODO
+- [x] saving and config 
 - [ ] forge the krab (animate)
 - [ ] make the krab do stuff
 - [ ] have krab stats 
@@ -42,7 +43,7 @@ cargo run
 - [ ] mini game for krab
 - [ ] think of things krab can do 
 - [ ] think about *maybe* implementing lobsters 
-- [ ] saving and config 
+- [ ] make mood, status and stage enums later 
 
 
 
