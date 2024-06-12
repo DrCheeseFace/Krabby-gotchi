@@ -5,10 +5,6 @@ extern crate savefile_derive;
 
 use clap::Parser;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use ratatui::{
-    prelude::*,
-    widgets::{block::*, *},
-};
 use std::io;
 use std::time::{Duration, Instant};
 mod krab;
@@ -46,7 +42,7 @@ impl App {
         Self {
             exit: false,
             tick_count: 0,
-            krab: krab::Krab::new(name.clone()),
+            krab: krab::Krab::new(name),
         }
     }
 
@@ -55,7 +51,7 @@ impl App {
         let tick_rate = Duration::from_millis(100);
         self.load_save();
         while !self.exit {
-            terminal.draw(|frame| self.render_frame(frame))?;
+            terminal.draw(|frame| tui::render_frame(self, frame))?;
             let timeout = tick_rate.saturating_sub(last_tick.elapsed());
             if event::poll(timeout).unwrap() {
                 self.handle_events()?;
@@ -68,32 +64,11 @@ impl App {
         Ok(())
     }
 
-    fn render_frame(&self, frame: &mut Frame) {
-        let horizontal =
-            Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let [krab, right] = vertical.areas(frame.size());
-        let [status, buttons] = horizontal.areas(right);
-
-        frame.render_widget(self.krab_canvas(), krab);
-        frame.render_widget(self.status_canvas(), status);
-        frame.render_widget(self.buttons_canvas(), buttons);
-    }
-
-    fn status_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.krab.age().to_string()).block(Block::new().borders(Borders::ALL))
-    }
-    fn krab_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.krab.name().clone()).block(Block::new().borders(Borders::ALL))
-    }
-    fn buttons_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL))
-    }
 
     fn on_tick(&mut self) -> io::Result<()> {
-        self.krab.grow_older();
         self.tick_count += 1;
         if self.tick_count % 600 == 0 {
+            self.krab.grow_older();
             self.save();
         }
         Ok(())
@@ -112,6 +87,7 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
+            KeyCode::Char('f') => self.krab.feed(),
             _ => {}
         }
     }
