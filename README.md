@@ -20,7 +20,7 @@ The krabs made me do it.
 ## Ok but what *really really* is this?
 Learning rust. 
 <br>
-Hopefully will have a terminal tamagotchi because tamagotchis 
+Hopefully will have a terminal tamagotchi by the end because tamagotchis 
 are expensive and crabs are free if you are near an ocean.
 
 ## Dev
@@ -34,9 +34,9 @@ cargo run
 ```
 ## TODO
 - [x] saving and config 
+- [x] have krab stats 
 - [ ] forge the krab (animate)
 - [ ] make the krab do stuff
-- [ ] have krab stats 
 - [ ] feed the  krab
 - [ ] train the krab
 - [ ] pet the krab 
