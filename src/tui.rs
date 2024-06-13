@@ -72,10 +72,9 @@ pub fn health_canvas(app: &mut App) -> impl Widget + '_ {
         .percent(*app.krab.health())
 }
 pub fn weight_canvas(app: &mut App) -> impl Widget + '_ {
-    Gauge::default()
-        .block(Block::bordered().title("Weight"))
-        .gauge_style(Style::default().fg(Color::White).bg(Color::Black))
-        .percent(*app.krab.weight())
+    let mut display_mood: String = "Weight: ".to_string();
+    display_mood.push_str(app.krab.weight().to_string().as_str());
+    Paragraph::new(display_mood).block(Block::new().borders(Borders::ALL))
 }
 pub fn mood_canvas(app: &mut App) -> impl Widget + '_ {
     let mut display_mood: String = "Mood: ".to_string();
