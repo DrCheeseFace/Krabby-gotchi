@@ -1,12 +1,12 @@
 #[derive(Debug, Savefile)]
 pub struct Krab {
     name: String,
-    hunger: u8,
-    happiness: u8,
-    health: u8,
+    hunger: u16,
+    happiness: u16,
+    health: u16,
     age: u64,
-    weight: u8,
-    size: u8,
+    weight: u16,
+    size: u16,
     mood: String,
     status: String,
     stage: String,
@@ -17,8 +17,8 @@ impl Krab {
         Self {
             name,
             hunger: 0,
-            happiness: 0,
-            health: 0,
+            happiness: 50,
+            health: 100,
             age: 0,
             weight: 0,
             size: 0,
@@ -28,6 +28,7 @@ impl Krab {
         }
     }
     pub fn grow_older(&mut self) {
+        //TODO vary += x based on current stats
         self.age += 1;
         match self.age {
             0..=5 => {
@@ -47,11 +48,10 @@ impl Krab {
             }
         }
     }
-    
+
     pub fn feed(&mut self) {
         todo!()
     }
-
 
     //getters
     #[warn(dead_code)]
@@ -62,23 +62,23 @@ impl Krab {
         &self.age
     }
 
-    // pub fn size(&self) -> &u8 {
+    pub fn hunger(&self) -> &u16 {
+        &self.hunger
+    }
+    pub fn happiness(&self) -> &u16 {
+        &self.happiness
+    }
+    pub fn health(&self) -> &u16 {
+        &self.health
+    }
+    pub fn weight(&self) -> &u16 {
+        &self.weight
+    }
+    pub fn mood(&self) -> &String {
+        &self.mood
+    }
+    // pub fn size(&self) -> &u16 {
     //     &self.size
-    // }
-    // pub fn hunger(&self) -> &u8 {
-    //     &self.hunger
-    // }
-    // pub fn happiness(&self) -> &u8 {
-    //     &self.happiness
-    // }
-    // pub fn health(&self) -> &u8 {
-    //     &self.health
-    // }
-    // pub fn weight(&self) -> &u8 {
-    //     &self.weight
-    // }
-    // pub fn mood(&self) -> &String {
-    //     &self.mood
     // }
     // pub fn status(&self) -> &String {
     //     &self.status
@@ -86,5 +86,4 @@ impl Krab {
     // pub fn stage(&self) -> &String {
     //     &self.stage
     // }
-    
 }
