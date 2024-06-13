@@ -5,12 +5,9 @@ extern crate savefile_derive;
 
 use clap::Parser;
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
-use ratatui::{
-    prelude::*,
-    widgets::{block::*, *},
-};
 use std::io;
 use std::time::{Duration, Instant};
+mod krab;
 mod tui;
 
 #[derive(Parser, Debug)]
@@ -29,42 +26,12 @@ struct Args {
 pub struct App {
     exit: bool,
     tick_count: u64,
-    name: String,
-    krab: Krab,
-}
-
-#[derive(Debug, Savefile)]
-struct Krab {
-    name: String,
-    hunger: u8,
-    happiness: u8,
-    health: u8,
-    age: u64,
-    weight: u8,
-    size: u8,
-    mood: String,
-    status: String,
-}
-
-impl Krab {
-    fn new(name: String) -> Self {
-        Self {
-            name,
-            hunger: 0,
-            happiness: 0,
-            health: 0,
-            age: 0,
-            weight: 0,
-            size: 0,
-            mood: String::from("neutral"),
-            status: String::from("alive"),
-        }
-    }
+    krab: krab::Krab,
 }
 
 fn main() -> io::Result<()> {
     let mut terminal = tui::init()?;
-    let mut app = App::new(Args::parse().name);
+    let mut app = App::new(Args::parse().name.clone());
     let app_result = app.run(&mut terminal);
     tui::restore()?;
     app_result
@@ -75,8 +42,7 @@ impl App {
         Self {
             exit: false,
             tick_count: 0,
-            name,
-            krab: Krab::new("Eugene Krabs".to_string()),
+            krab: krab::Krab::new(name),
         }
     }
 
@@ -85,7 +51,7 @@ impl App {
         let tick_rate = Duration::from_millis(100);
         self.load_save();
         while !self.exit {
-            terminal.draw(|frame| self.render_frame(frame))?;
+            terminal.draw(|frame| tui::render_frame(self, frame))?;
             let timeout = tick_rate.saturating_sub(last_tick.elapsed());
             if event::poll(timeout).unwrap() {
                 self.handle_events()?;
@@ -98,32 +64,13 @@ impl App {
         Ok(())
     }
 
-    fn render_frame(&self, frame: &mut Frame) {
-        let horizontal =
-            Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let [krab, right] = vertical.areas(frame.size());
-        let [status, buttons] = horizontal.areas(right);
-
-        frame.render_widget(self.krab_canvas(), krab);
-        frame.render_widget(self.status_canvas(), status);
-        frame.render_widget(self.buttons_canvas(), buttons);
-    }
-
-    fn status_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.krab.age.to_string()).block(Block::new().borders(Borders::ALL))
-    }
-    fn krab_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.name.clone()).block(Block::new().borders(Borders::ALL))
-    }
-    fn buttons_canvas(&self) -> impl Widget + '_ {
-        Paragraph::new(self.tick_count.to_string()).block(Block::new().borders(Borders::ALL))
-    }
 
     fn on_tick(&mut self) -> io::Result<()> {
-        self.krab.age += 1;
         self.tick_count += 1;
-        self.save();
+        if self.tick_count % 600 == 0 {
+            self.krab.grow_older();
+            self.save();
+        }
         Ok(())
     }
 
@@ -140,6 +87,7 @@ impl App {
     fn handle_key_event(&mut self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
+            KeyCode::Char('f') => self.krab.feed(),
             _ => {}
         }
     }
@@ -149,7 +97,7 @@ impl App {
     }
 
     fn save(&self) {
-        let save_krab = save_file("krabby-gotchi.save", 0,  &self.krab);
+        let save_krab = save_file("krabby-gotchi.save", 0, &self.krab);
         match save_krab {
             Ok(_) => {}
             Err(_) => {
@@ -159,24 +107,16 @@ impl App {
     }
 
     fn load_save(&mut self) {
-        let loaded_krab =load_file::<Krab, &str>("krabby-gotchi.save", 0);
+        let loaded_krab = load_file::<krab::Krab, &str>("krabby-gotchi.save", 0);
         match loaded_krab {
             Ok(_) => {
                 self.krab = loaded_krab.unwrap();
             }
             Err(_) => {
-                let newkrab = Krab::new("Eugene Krabs".to_string());
+                let newkrab = krab::Krab::new(Args::parse().name.clone());
                 self.krab = newkrab;
                 self.save();
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn strokethatthangcuzzo() {
-        assert_eq!(true, 1 == 1);
     }
 }
