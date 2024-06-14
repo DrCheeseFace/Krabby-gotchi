@@ -20,10 +20,9 @@ pub fn restore() -> io::Result<()> {
     Ok(())
 }
 pub fn render_frame(app: &mut App, frame: &mut Frame) {
-    let horizontal = Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)]);
     let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-    let [krab, bottom] = vertical.areas(frame.size());
-    let [status, buttons] = horizontal.areas(bottom);
+    let [krab, status] = vertical.areas(frame.size());
+
     let status_chunks = Layout::default()
         .direction(Direction::Vertical)
         .constraints(
@@ -38,14 +37,18 @@ pub fn render_frame(app: &mut App, frame: &mut Frame) {
             .as_ref(),
         )
         .split(status);
+
     frame.render_widget(krab_canvas(app), krab);
-    frame.render_widget(buttons_canvas(app), buttons);
     frame.render_widget(name_canvas(app), *status_chunks.get(0).unwrap());
     frame.render_widget(hunger_canvas(app), *status_chunks.get(1).unwrap());
     frame.render_widget(happiness_canvas(app), *status_chunks.get(2).unwrap());
     frame.render_widget(health_canvas(app), *status_chunks.get(3).unwrap());
     frame.render_widget(weight_canvas(app), *status_chunks.get(4).unwrap());
     frame.render_widget(mood_canvas(app), *status_chunks.get(5).unwrap());
+
+    if app.show_help_menu {
+        frame.render_widget(help_menu_canvas(), centered_rect(frame.size(), 20, 20));
+    }
 }
 
 pub fn name_canvas(app: &mut App) -> impl Widget + '_ {
@@ -56,19 +59,19 @@ pub fn name_canvas(app: &mut App) -> impl Widget + '_ {
 pub fn hunger_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::bordered().title("Hunger"))
-        .gauge_style(Style::default().fg(Color::White).bg(Color::Black))
+        .gauge_style(Style::default().fg(Color::Red))
         .percent(*app.krab.hunger())
 }
 pub fn happiness_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::bordered().title("Happiness"))
-        .gauge_style(Style::default().fg(Color::White).bg(Color::Black))
+        .gauge_style(Style::default().fg(Color::Red))
         .percent(*app.krab.happiness())
 }
 pub fn health_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::bordered().title("Health"))
-        .gauge_style(Style::default().fg(Color::White).bg(Color::Black))
+        .gauge_style(Style::default().fg(Color::Red))
         .percent(*app.krab.health())
 }
 pub fn weight_canvas(app: &mut App) -> impl Widget + '_ {
@@ -84,6 +87,40 @@ pub fn mood_canvas(app: &mut App) -> impl Widget + '_ {
 pub fn krab_canvas(app: &mut App) -> impl Widget + '_ {
     Paragraph::new(app.krab.age().to_string()).block(Block::new().borders(Borders::ALL))
 }
-pub fn buttons_canvas(app: &mut App) -> impl Widget + '_ {
-    Paragraph::new(app.tick_count.to_string()).block(Block::new().borders(Borders::ALL))
+pub fn help_menu_canvas() -> impl Widget + 'static {
+    let text = vec![
+        Line::from("Feed -> f"),
+        Line::from("Pet -> p"),
+        Line::from("Save -> s"),
+        Line::from("Quit -> q"),
+        Line::from("Help-> h"),
+    ];
+    Paragraph::new(text)
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .not_slow_blink()
+                .title("Help Menu")
+                .bg(Color::Black),
+        )
+        .centered()
+}
+
+fn centered_rect(r: Rect, percent_x: u16, percent_y: u16) -> Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([
+            Constraint::Percentage((100 - percent_y) / 2),
+            Constraint::Percentage(percent_y),
+            Constraint::Percentage((100 - percent_y) / 2),
+        ])
+        .split(r);
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints([
+            Constraint::Percentage((100 - percent_x) / 2),
+            Constraint::Percentage(percent_x),
+            Constraint::Percentage((100 - percent_x) / 2),
+        ])
+        .split(popup_layout[1])[1]
 }

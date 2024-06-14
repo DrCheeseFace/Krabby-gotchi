@@ -27,6 +27,7 @@ pub struct App {
     exit: bool,
     tick_count: u64,
     krab: krab::Krab,
+    show_help_menu: bool,
 }
 
 fn main() -> io::Result<()> {
@@ -43,6 +44,7 @@ impl App {
             exit: false,
             tick_count: 0,
             krab: krab::Krab::new(name),
+            show_help_menu: false,
         }
     }
 
@@ -63,7 +65,6 @@ impl App {
         }
         Ok(())
     }
-
 
     fn on_tick(&mut self) -> io::Result<()> {
         self.tick_count += 1;
@@ -88,8 +89,16 @@ impl App {
         match key_event.code {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Char('f') => self.krab.feed(),
+            KeyCode::Char('p') => self.krab.pet(),
+            KeyCode::Char('s') => self.save(),
+            KeyCode::Char('h') => self.toggle_help(),
             _ => {}
         }
+    }
+
+
+    fn toggle_help(&mut self) {
+        self.show_help_menu = !self.show_help_menu;
     }
 
     fn exit(&mut self) {

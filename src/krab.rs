@@ -49,8 +49,12 @@ impl Krab {
         }
     }
 
+    pub fn pet(&mut self) {
+        self.happiness += 5;
+    }
+
     pub fn feed(&mut self) {
-        todo!()
+        self.hunger += 5;
     }
 
     //getters
