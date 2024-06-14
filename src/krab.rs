@@ -49,8 +49,20 @@ impl Krab {
         }
     }
 
+    pub fn pet(&mut self) {
+        if self.happiness < 95 {
+            self.happiness += 5;
+        } else {
+            self.happiness = 100;
+        }
+    }
+
     pub fn feed(&mut self) {
-        todo!()
+        if self.hunger < 95 {
+            self.hunger += 5;
+        } else {
+            self.hunger = 100;
+        }
     }
 
     //getters
