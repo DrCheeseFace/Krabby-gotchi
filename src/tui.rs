@@ -105,7 +105,6 @@ pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .not_slow_blink()
                 .title("Help Menu")
                 .bg(Color::Black)
                 .padding(Padding::new(0, 0, rect.height / 4, 0)),
@@ -124,7 +123,6 @@ pub fn save_alert_canvas(app: &mut App, rect: Rect) -> impl Widget + 'static {
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .not_slow_blink()
                 .padding(Padding::new(0, 0, rect.height / 3, 0))
         )
         .alignment(Alignment::Center)
