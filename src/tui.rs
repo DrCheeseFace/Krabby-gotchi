@@ -46,8 +46,13 @@ pub fn render_frame(app: &mut App, frame: &mut Frame) {
     frame.render_widget(weight_canvas(app), *status_chunks.get(4).unwrap());
     frame.render_widget(mood_canvas(app), *status_chunks.get(5).unwrap());
 
+let help_menu_center_rect: Rect  = centered_rect(frame.size(), 30, 30);
     if app.show_help_menu {
-        frame.render_widget(help_menu_canvas(), centered_rect(frame.size(), 20, 20));
+        frame.render_widget(help_menu_canvas(help_menu_center_rect), help_menu_center_rect);
+    }
+let save_alert_center_rect: Rect  = centered_rect(frame.size(), 10, 10);
+    if app.show_save_alert {
+        frame.render_widget(save_alert_canvas(app, save_alert_center_rect), save_alert_center_rect);
     }
 }
 
@@ -87,7 +92,8 @@ pub fn mood_canvas(app: &mut App) -> impl Widget + '_ {
 pub fn krab_canvas(app: &mut App) -> impl Widget + '_ {
     Paragraph::new(app.krab.age().to_string()).block(Block::new().borders(Borders::ALL))
 }
-pub fn help_menu_canvas() -> impl Widget + 'static {
+
+pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
     let text = vec![
         Line::from("Feed -> f"),
         Line::from("Pet -> p"),
@@ -101,9 +107,27 @@ pub fn help_menu_canvas() -> impl Widget + 'static {
                 .borders(Borders::ALL)
                 .not_slow_blink()
                 .title("Help Menu")
-                .bg(Color::Black),
+                .bg(Color::Black)
+                .padding(Padding::new(0, 0, rect.height / 4, 0)),
         )
-        .centered()
+        .alignment(Alignment::Center)
+}
+
+pub fn save_alert_canvas(app: &mut App, rect: Rect) -> impl Widget + 'static {
+    if app.show_save_alert {
+        app.show_save_timer -= 1;
+        if app.show_save_timer == 0 {
+            app.show_save_alert = false;
+        }
+    }
+    Paragraph::new("saved!")
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .not_slow_blink()
+                .padding(Padding::new(0, 0, rect.height / 3, 0))
+        )
+        .alignment(Alignment::Center)
 }
 
 fn centered_rect(r: Rect, percent_x: u16, percent_y: u16) -> Rect {

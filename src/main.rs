@@ -28,6 +28,8 @@ pub struct App {
     tick_count: u64,
     krab: krab::Krab,
     show_help_menu: bool,
+    show_save_alert: bool,
+    show_save_timer: u16,
 }
 
 fn main() -> io::Result<()> {
@@ -45,6 +47,8 @@ impl App {
             tick_count: 0,
             krab: krab::Krab::new(name),
             show_help_menu: false,
+            show_save_alert: false,
+            show_save_timer: 0,
         }
     }
 
@@ -96,7 +100,6 @@ impl App {
         }
     }
 
-
     fn toggle_help(&mut self) {
         self.show_help_menu = !self.show_help_menu;
     }
@@ -105,7 +108,7 @@ impl App {
         self.exit = true;
     }
 
-    fn save(&self) {
+    fn save(&mut self) {
         let save_krab = save_file("krabby-gotchi.save", 0, &self.krab);
         match save_krab {
             Ok(_) => {}
@@ -113,6 +116,8 @@ impl App {
                 println!("Failed to save");
             }
         }
+        self.show_save_alert = true;
+        self.show_save_timer = 10;
     }
 
     fn load_save(&mut self) {
