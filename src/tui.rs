@@ -106,7 +106,6 @@ pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
             Block::default()
                 .borders(Borders::ALL)
                 .title("Help Menu")
-                .bg(Color::Black)
                 .padding(Padding::new(0, 0, rect.height / 4, 0)),
         )
         .alignment(Alignment::Center)
