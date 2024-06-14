@@ -35,15 +35,16 @@ cargo run
 ## TODO
 - [x] saving and config 
 - [x] have krab stats 
+- [x] feed the krab
+- [x] pet the krab 
 - [ ] forge the krab (animate)
 - [ ] make the krab do stuff
-- [ ] feed the  krab
 - [ ] train the krab
-- [ ] pet the krab 
 - [ ] mini game for krab
 - [ ] think of things krab can do 
 - [ ] think about *maybe* implementing lobsters 
 - [ ] make mood, status and stage enums later 
+- [ ] tick down/ up status overtime 
 
 
 
