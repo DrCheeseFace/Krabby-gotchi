@@ -107,7 +107,7 @@ impl App {
         self.save(false);
     }
 
-    fn save(&mut self, show_save: bool) {
+    fn save(&mut self, show_save_alert: bool) {
         let save_krab = save_file("krabby-gotchi.save", 0, &self.krab);
         match save_krab {
             Ok(_) => {}
@@ -115,7 +115,7 @@ impl App {
                 println!("Failed to save");
             }
         }
-        if show_save {
+        if show_save_alert {
             self.show_save_timer = 10;
         }
     }
