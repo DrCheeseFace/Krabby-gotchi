@@ -51,7 +51,7 @@ let help_menu_center_rect: Rect  = centered_rect(frame.size(), 30, 30);
         frame.render_widget(help_menu_canvas(help_menu_center_rect), help_menu_center_rect);
     }
 let save_alert_center_rect: Rect  = centered_rect(frame.size(), 10, 10);
-    if app.show_save_alert {
+    if app.show_save_timer > 0 {
         frame.render_widget(save_alert_canvas(app, save_alert_center_rect), save_alert_center_rect);
     }
 }
@@ -98,8 +98,8 @@ pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
         Line::from("Feed -> f"),
         Line::from("Pet -> p"),
         Line::from("Save -> s"),
+        Line::from("Toggle Help -> h"),
         Line::from("Quit -> q"),
-        Line::from("Help-> h"),
     ];
     Paragraph::new(text)
         .block(
@@ -112,11 +112,8 @@ pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
 }
 
 pub fn save_alert_canvas(app: &mut App, rect: Rect) -> impl Widget + 'static {
-    if app.show_save_alert {
+    if app.show_save_timer > 0{
         app.show_save_timer -= 1;
-        if app.show_save_timer == 0 {
-            app.show_save_alert = false;
-        }
     }
     Paragraph::new("saved!")
         .block(
