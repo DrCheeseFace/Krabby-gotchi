@@ -28,7 +28,6 @@ pub struct App {
     tick_count: u64,
     krab: krab::Krab,
     show_help_menu: bool,
-    show_save_alert: bool,
     show_save_timer: u16,
 }
 
@@ -47,7 +46,6 @@ impl App {
             tick_count: 0,
             krab: krab::Krab::new(name),
             show_help_menu: false,
-            show_save_alert: false,
             show_save_timer: 0,
         }
     }
@@ -73,8 +71,8 @@ impl App {
     fn on_tick(&mut self) -> io::Result<()> {
         self.tick_count += 1;
         if self.tick_count % 600 == 0 {
-            self.krab.grow_older();
-            self.save();
+            self.krab.on_tick();
+            self.save(true);
         }
         Ok(())
     }
@@ -94,7 +92,7 @@ impl App {
             KeyCode::Char('q') => self.exit(),
             KeyCode::Char('f') => self.krab.feed(),
             KeyCode::Char('p') => self.krab.pet(),
-            KeyCode::Char('s') => self.save(),
+            KeyCode::Char('s') => self.save(true),
             KeyCode::Char('h') => self.toggle_help(),
             _ => {}
         }
@@ -106,9 +104,10 @@ impl App {
 
     fn exit(&mut self) {
         self.exit = true;
+        self.save(false);
     }
 
-    fn save(&mut self) {
+    fn save(&mut self, show_save_alert: bool) {
         let save_krab = save_file("krabby-gotchi.save", 0, &self.krab);
         match save_krab {
             Ok(_) => {}
@@ -116,8 +115,9 @@ impl App {
                 println!("Failed to save");
             }
         }
-        self.show_save_alert = true;
-        self.show_save_timer = 10;
+        if show_save_alert {
+            self.show_save_timer = 10;
+        }
     }
 
     fn load_save(&mut self) {
@@ -129,7 +129,7 @@ impl App {
             Err(_) => {
                 let newkrab = krab::Krab::new(Args::parse().name.clone());
                 self.krab = newkrab;
-                self.save();
+                self.save(false);
             }
         }
     }

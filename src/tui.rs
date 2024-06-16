@@ -27,12 +27,12 @@ pub fn render_frame(app: &mut App, frame: &mut Frame) {
         .direction(Direction::Vertical)
         .constraints(
             [
-                Constraint::Percentage(17),
-                Constraint::Percentage(16),
-                Constraint::Percentage(17),
-                Constraint::Percentage(16),
-                Constraint::Percentage(17),
-                Constraint::Percentage(17),
+                Constraint::Percentage(10),
+                Constraint::Percentage(23),
+                Constraint::Percentage(23),
+                Constraint::Percentage(23),
+                Constraint::Percentage(10),
+                Constraint::Percentage(10),
             ]
             .as_ref(),
         )
@@ -43,54 +43,60 @@ pub fn render_frame(app: &mut App, frame: &mut Frame) {
     frame.render_widget(hunger_canvas(app), *status_chunks.get(1).unwrap());
     frame.render_widget(happiness_canvas(app), *status_chunks.get(2).unwrap());
     frame.render_widget(health_canvas(app), *status_chunks.get(3).unwrap());
-    frame.render_widget(weight_canvas(app), *status_chunks.get(4).unwrap());
-    frame.render_widget(mood_canvas(app), *status_chunks.get(5).unwrap());
+    frame.render_widget(status_canvas(app), *status_chunks.get(4).unwrap());
+    frame.render_widget(stage_canvas(app), *status_chunks.get(5).unwrap());
 
-let help_menu_center_rect: Rect  = centered_rect(frame.size(), 30, 30);
+    let help_menu_center_rect: Rect = centered_rect(frame.size(), 30, 30);
     if app.show_help_menu {
-        frame.render_widget(help_menu_canvas(help_menu_center_rect), help_menu_center_rect);
+        frame.render_widget(
+            help_menu_canvas(help_menu_center_rect),
+            help_menu_center_rect,
+        );
     }
-let save_alert_center_rect: Rect  = centered_rect(frame.size(), 10, 10);
-    if app.show_save_alert {
-        frame.render_widget(save_alert_canvas(app, save_alert_center_rect), save_alert_center_rect);
+    let save_alert_center_rect: Rect = centered_rect(frame.size(), 10, 10);
+    if app.show_save_timer > 0 {
+        frame.render_widget(
+            save_alert_canvas(app, save_alert_center_rect),
+            save_alert_center_rect,
+        );
     }
 }
 
 pub fn name_canvas(app: &mut App) -> impl Widget + '_ {
     let mut display_name: String = "Name: ".to_string();
     display_name.push_str(app.krab.name());
-    Paragraph::new(display_name).block(Block::new().borders(Borders::ALL))
+    Paragraph::new(display_name).block(Block::new())
 }
 pub fn hunger_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
-        .block(Block::bordered().title("Hunger"))
+        .block(Block::new().title("Hunger").borders(Borders::TOP))
         .gauge_style(Style::default().fg(Color::Red))
         .percent(*app.krab.hunger())
 }
 pub fn happiness_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
-        .block(Block::bordered().title("Happiness"))
+        .block(Block::new().title("Happiness"))
         .gauge_style(Style::default().fg(Color::Red))
         .percent(*app.krab.happiness())
 }
 pub fn health_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
-        .block(Block::bordered().title("Health"))
+        .block(Block::new().title("Health").borders(Borders::BOTTOM))
         .gauge_style(Style::default().fg(Color::Red))
         .percent(*app.krab.health())
 }
-pub fn weight_canvas(app: &mut App) -> impl Widget + '_ {
-    let mut display_mood: String = "Weight: ".to_string();
-    display_mood.push_str(app.krab.weight().to_string().as_str());
-    Paragraph::new(display_mood).block(Block::new().borders(Borders::ALL))
+pub fn status_canvas(app: &mut App) -> impl Widget + '_ {
+    let mut display_mood: String = "Status: ".to_string();
+    display_mood.push_str(app.krab.status());
+    Paragraph::new(display_mood).block(Block::new())
 }
-pub fn mood_canvas(app: &mut App) -> impl Widget + '_ {
-    let mut display_mood: String = "Mood: ".to_string();
-    display_mood.push_str(app.krab.mood().to_string().as_str());
-    Paragraph::new(display_mood).block(Block::new().borders(Borders::ALL))
+pub fn stage_canvas(app: &mut App) -> impl Widget + '_ {
+    let mut display_mood: String = "Stage: ".to_string();
+    display_mood.push_str(app.krab.stage());
+    Paragraph::new(display_mood).block(Block::new())
 }
 pub fn krab_canvas(app: &mut App) -> impl Widget + '_ {
-    Paragraph::new(app.krab.age().to_string()).block(Block::new().borders(Borders::ALL))
+    Paragraph::new(app.krab.age().to_string()).block(Block::new())
 }
 
 pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
@@ -98,8 +104,8 @@ pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
         Line::from("Feed -> f"),
         Line::from("Pet -> p"),
         Line::from("Save -> s"),
+        Line::from("Toggle Help -> h"),
         Line::from("Quit -> q"),
-        Line::from("Help-> h"),
     ];
     Paragraph::new(text)
         .block(
@@ -112,18 +118,16 @@ pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
 }
 
 pub fn save_alert_canvas(app: &mut App, rect: Rect) -> impl Widget + 'static {
-    if app.show_save_alert {
+    if app.show_save_timer > 0 {
         app.show_save_timer -= 1;
-        if app.show_save_timer == 0 {
-            app.show_save_alert = false;
-        }
     }
     Paragraph::new("saved!")
-        .block(
-            Block::default()
-                .borders(Borders::ALL)
-                .padding(Padding::new(0, 0, rect.height / 3, 0))
-        )
+        .block(Block::default().borders(Borders::ALL).padding(Padding::new(
+            0,
+            0,
+            rect.height / 3,
+            0,
+        )))
         .alignment(Alignment::Center)
 }
 

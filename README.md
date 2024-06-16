@@ -37,14 +37,10 @@ cargo run
 - [x] have krab stats 
 - [x] feed the krab
 - [x] pet the krab 
+- [x] tick down/ up status overtime 
 - [ ] forge the krab (animate)
-- [ ] make the krab do stuff
-- [ ] train the krab
-- [ ] mini game for krab
-- [ ] think of things krab can do 
 - [ ] think about *maybe* implementing lobsters 
 - [ ] make mood, status and stage enums later 
-- [ ] tick down/ up status overtime 
 
 
 
