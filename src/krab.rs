@@ -83,6 +83,7 @@ impl Krab {
             }
         } else {
             self.happiness = 0;
+            self.hunger = 0;
         }
         self.starve();
     }
