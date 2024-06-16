@@ -71,19 +71,20 @@ pub fn hunger_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Hunger").borders(Borders::TOP))
         .gauge_style(Style::default().fg(match_bar_color(app.krab.hunger())))
-        .percent(*app.krab.hunger())
+        .percent((*app.krab.hunger()/10) as u16)
+        
 }
 pub fn happiness_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Happiness"))
         .gauge_style(Style::default().fg(match_bar_color(app.krab.happiness())))
-        .percent(*app.krab.happiness())
+        .percent((*app.krab.happiness()/10) as u16)
 }
 pub fn health_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Health").borders(Borders::BOTTOM))
         .gauge_style(Style::default().fg(match_bar_color(app.krab.health())))
-        .percent(*app.krab.health())
+        .percent((*app.krab.health()/10) as u16)
 }
 pub fn status_canvas(app: &mut App) -> impl Widget + '_ {
     let mut display_mood: String = "Status: ".to_string();
@@ -133,10 +134,10 @@ pub fn save_alert_canvas(app: &mut App, rect: Rect) -> impl Widget + 'static {
 
 fn match_bar_color(percent: &u16) -> Color {
     match percent {
-        0..=20 => Color::Red,
-        21..=50 => Color::Yellow,
-        51..=75=> Color::LightGreen,
-        76..=100=> Color::Green,
+        0..=200 => Color::Red,
+        201..=500 => Color::Yellow,
+        501..=750=> Color::LightGreen,
+        751..=1000=> Color::Green,
         _ => Color::LightMagenta
     }
 }
