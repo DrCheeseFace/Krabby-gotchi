@@ -43,8 +43,8 @@ pub fn render_frame(app: &mut App, frame: &mut Frame) {
     frame.render_widget(hunger_canvas(app), *status_chunks.get(1).unwrap());
     frame.render_widget(happiness_canvas(app), *status_chunks.get(2).unwrap());
     frame.render_widget(health_canvas(app), *status_chunks.get(3).unwrap());
-    frame.render_widget(weight_canvas(app), *status_chunks.get(4).unwrap());
-    frame.render_widget(mood_canvas(app), *status_chunks.get(5).unwrap());
+    frame.render_widget(status_canvas(app), *status_chunks.get(4).unwrap());
+    frame.render_widget(stage_canvas(app), *status_chunks.get(5).unwrap());
 
     let help_menu_center_rect: Rect = centered_rect(frame.size(), 30, 30);
     if app.show_help_menu {
@@ -85,14 +85,14 @@ pub fn health_canvas(app: &mut App) -> impl Widget + '_ {
         .gauge_style(Style::default().fg(Color::Red))
         .percent(*app.krab.health())
 }
-pub fn weight_canvas(app: &mut App) -> impl Widget + '_ {
-    let mut display_mood: String = "Weight: ".to_string();
-    display_mood.push_str(app.krab.weight().to_string().as_str());
+pub fn status_canvas(app: &mut App) -> impl Widget + '_ {
+    let mut display_mood: String = "Status: ".to_string();
+    display_mood.push_str(app.krab.status());
     Paragraph::new(display_mood).block(Block::new())
 }
-pub fn mood_canvas(app: &mut App) -> impl Widget + '_ {
-    let mut display_mood: String = "Mood: ".to_string();
-    display_mood.push_str(app.krab.mood().to_string().as_str());
+pub fn stage_canvas(app: &mut App) -> impl Widget + '_ {
+    let mut display_mood: String = "Stage: ".to_string();
+    display_mood.push_str(app.krab.stage());
     Paragraph::new(display_mood).block(Block::new())
 }
 pub fn krab_canvas(app: &mut App) -> impl Widget + '_ {

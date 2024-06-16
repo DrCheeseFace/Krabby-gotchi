@@ -71,7 +71,7 @@ impl App {
     fn on_tick(&mut self) -> io::Result<()> {
         self.tick_count += 1;
         if self.tick_count % 600 == 0 {
-            self.krab.grow_older();
+            self.krab.on_tick();
             self.save(true);
         }
         Ok(())
