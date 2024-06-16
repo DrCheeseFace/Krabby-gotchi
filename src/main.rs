@@ -70,8 +70,10 @@ impl App {
 
     fn on_tick(&mut self) -> io::Result<()> {
         self.tick_count += 1;
-        if self.tick_count % 600 == 0 {
+        if self.tick_count % 6 == 0 {
             self.krab.on_tick();
+        }
+        if self.tick_count % 600 == 0 {
             self.save(true);
         }
         Ok(())

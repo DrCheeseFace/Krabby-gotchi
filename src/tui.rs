@@ -70,20 +70,21 @@ pub fn name_canvas(app: &mut App) -> impl Widget + '_ {
 pub fn hunger_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Hunger").borders(Borders::TOP))
-        .gauge_style(Style::default().fg(Color::Red))
-        .percent(*app.krab.hunger())
+        .gauge_style(Style::default().fg(match_bar_color(app.krab.hunger())))
+        .percent((*app.krab.hunger()/10) as u16)
+        
 }
 pub fn happiness_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Happiness"))
-        .gauge_style(Style::default().fg(Color::Red))
-        .percent(*app.krab.happiness())
+        .gauge_style(Style::default().fg(match_bar_color(app.krab.happiness())))
+        .percent((*app.krab.happiness()/10) as u16)
 }
 pub fn health_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Health").borders(Borders::BOTTOM))
-        .gauge_style(Style::default().fg(Color::Red))
-        .percent(*app.krab.health())
+        .gauge_style(Style::default().fg(match_bar_color(app.krab.health())))
+        .percent((*app.krab.health()/10) as u16)
 }
 pub fn status_canvas(app: &mut App) -> impl Widget + '_ {
     let mut display_mood: String = "Status: ".to_string();
@@ -131,6 +132,15 @@ pub fn save_alert_canvas(app: &mut App, rect: Rect) -> impl Widget + 'static {
         .alignment(Alignment::Center)
 }
 
+fn match_bar_color(percent: &u16) -> Color {
+    match percent {
+        0..=200 => Color::Red,
+        201..=500 => Color::Yellow,
+        501..=750=> Color::LightGreen,
+        751..=1000=> Color::Green,
+        _ => Color::LightMagenta
+    }
+}
 fn centered_rect(r: Rect, percent_x: u16, percent_y: u16) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
