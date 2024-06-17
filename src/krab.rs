@@ -73,7 +73,7 @@ impl Krab {
                 self.sadder(2);
             }
             if self.happiness < 300 {
-                self.starve();
+                self.starve()
             }
 
             let mut rng = thread_rng();
