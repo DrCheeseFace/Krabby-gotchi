@@ -19,7 +19,7 @@ impl Krab {
             hunger: 0,
             happiness: 500,
             health: 500,
-            age: 582801,
+            age: 0,
             mood: String::from("neutral"),
             status: String::from("alive"),
             stage: String::from("egg"),
