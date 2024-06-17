@@ -1,6 +1,6 @@
 # A Krabby-gotchi (via the terminal)
 
-![alt text](https://upload.wikimedia.org/wikipedia/commons/a/a5/Sally_Lightfoot_Crab_2019.jpg)
+(![terminal app preview](https://github.com/DrCheeseFace/Krabby-gotchi/blob/master/crab.JPG?raw=true))
 <p>her name is sally^</p>
 
 
