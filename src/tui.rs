@@ -38,7 +38,7 @@ pub fn render_frame(app: &mut App, frame: &mut Frame) {
         )
         .split(status);
 
-    frame.render_widget(krab_canvas(app), krab);
+    frame.render_widget(krab_canvas(app, krab), krab);
     frame.render_widget(name_canvas(app), *status_chunks.get(0).unwrap());
     frame.render_widget(hunger_canvas(app), *status_chunks.get(1).unwrap());
     frame.render_widget(happiness_canvas(app), *status_chunks.get(2).unwrap());
@@ -53,6 +53,7 @@ pub fn render_frame(app: &mut App, frame: &mut Frame) {
             help_menu_center_rect,
         );
     }
+
     let save_alert_center_rect: Rect = centered_rect(frame.size(), 10, 10);
     if app.show_save_timer > 0 {
         frame.render_widget(
@@ -71,20 +72,19 @@ pub fn hunger_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Hunger").borders(Borders::TOP))
         .gauge_style(Style::default().fg(match_bar_color(app.krab.hunger())))
-        .percent((*app.krab.hunger()/10) as u16)
-        
+        .percent((*app.krab.hunger() / 10) as u16)
 }
 pub fn happiness_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Happiness"))
         .gauge_style(Style::default().fg(match_bar_color(app.krab.happiness())))
-        .percent((*app.krab.happiness()/10) as u16)
+        .percent((*app.krab.happiness() / 10) as u16)
 }
 pub fn health_canvas(app: &mut App) -> impl Widget + '_ {
     Gauge::default()
         .block(Block::new().title("Health").borders(Borders::BOTTOM))
         .gauge_style(Style::default().fg(match_bar_color(app.krab.health())))
-        .percent((*app.krab.health()/10) as u16)
+        .percent((*app.krab.health() / 10) as u16)
 }
 pub fn status_canvas(app: &mut App) -> impl Widget + '_ {
     let mut display_mood: String = "Status: ".to_string();
@@ -96,8 +96,15 @@ pub fn stage_canvas(app: &mut App) -> impl Widget + '_ {
     display_mood.push_str(app.krab.stage());
     Paragraph::new(display_mood).block(Block::new())
 }
-pub fn krab_canvas(app: &mut App) -> impl Widget + '_ {
-    Paragraph::new(app.krab.age().to_string()).block(Block::new())
+pub fn krab_canvas(app: &mut App, rect: Rect) -> impl Widget + '_ {
+    Paragraph::new(app.krab.ascii().join("\n"))
+        .block(
+            Block::default()
+                .borders(Borders::ALL)
+                .padding(Padding::new(0, 0, rect.height / 4, 0)),
+        )
+        .alignment(Alignment::Center)
+
 }
 
 pub fn help_menu_canvas(rect: Rect) -> impl Widget + 'static {
@@ -136,11 +143,13 @@ fn match_bar_color(percent: &u16) -> Color {
     match percent {
         0..=200 => Color::Red,
         201..=500 => Color::Yellow,
-        501..=750=> Color::LightGreen,
-        751..=1000=> Color::Green,
-        _ => Color::LightMagenta
+        501..=750 => Color::LightGreen,
+        751..=1000 => Color::Green,
+        _ => Color::LightMagenta,
     }
 }
+
+
 fn centered_rect(r: Rect, percent_x: u16, percent_y: u16) -> Rect {
     let popup_layout = Layout::default()
         .direction(Direction::Vertical)
