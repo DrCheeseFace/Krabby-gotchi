@@ -59,15 +59,15 @@ impl Krab {
                 }
             }
 
-            if self.hunger > 80 {
+            if self.hunger > 800 {
                 self.heal();
                 self.pet();
             }
-            if self.hunger < 50 {
+            if self.hunger < 500 {
                 self.injure();
             }
 
-            if (self.hunger < 30) == (self.health < 30) {
+            if (self.hunger < 300) == (self.health < 300) {
                 self.sadder(5);
             } else {
                 self.sadder(2);
