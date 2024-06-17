@@ -72,6 +72,9 @@ impl Krab {
             } else {
                 self.sadder(2);
             }
+            if self.happiness < 300 {
+                self.starve();
+            }
 
             let mut rng = thread_rng();
             let m: f64 = (self.hunger as f64 + self.health as f64) / 2000 as f64;
