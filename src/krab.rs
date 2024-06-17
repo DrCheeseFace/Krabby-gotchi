@@ -19,7 +19,7 @@ impl Krab {
             hunger: 0,
             happiness: 500,
             health: 500,
-            age: 0,
+            age: 582801,
             mood: String::from("neutral"),
             status: String::from("alive"),
             stage: String::from("egg"),
@@ -32,13 +32,10 @@ impl Krab {
             0..=500 => {
                 self.stage = String::from("egg");
             }
-            501..=6600 => {
+            501..=10000 => {
                 self.stage = String::from("baby");
             }
-            6601..=150700 => {
-                self.stage = String::from("teen");
-            }
-            150701..=582800 => {
+            10001..=582800 => {
                 self.stage = String::from("adult");
             }
             _ => {
@@ -59,18 +56,21 @@ impl Krab {
                 }
             }
 
-            if self.hunger > 80 {
+            if self.hunger > 800 {
                 self.heal();
                 self.pet();
             }
-            if self.hunger < 50 {
+            if self.hunger < 500 {
                 self.injure();
             }
 
-            if (self.hunger < 30) == (self.health < 30) {
+            if (self.hunger < 300) == (self.health < 300) {
                 self.sadder(5);
             } else {
                 self.sadder(2);
+            }
+            if self.happiness < 300 {
+                self.starve()
             }
 
             let mut rng = thread_rng();
@@ -147,9 +147,6 @@ impl Krab {
     pub fn name(&self) -> &String {
         &self.name
     }
-    pub fn age(&self) -> &u64 {
-        &self.age
-    }
     pub fn hunger(&self) -> &u16 {
         &self.hunger
     }
@@ -164,5 +161,74 @@ impl Krab {
     }
     pub fn stage(&self) -> &String {
         &self.stage
+    }
+
+    pub fn ascii(&self) -> Vec<&str> {
+        let text = match self.stage.as_str() {
+            "egg" => {
+                vec![
+                    "       ████       ",
+                    "     ██░░░░██     ",
+                    "   ██░░░░░░░░██   ",
+                    "   ██░░░░░░░░██   ",
+                    " ██░░░░░░░░░░░░██ ",
+                    " ██░░░░░░░░░░░░██ ",
+                    " ██░░░░░░░░░░░░██ ",
+                    "   ██░░░░░░░░██   ",
+                    "     ████████     ",
+                ]
+            }
+            "baby" => {
+                vec![
+                    "      ░░                      ",
+                    "    ░░░░              ░░░░░░  ",
+                    "    ░░░░  ░░            ░░░░░░",
+                    "    ░░░░  ░░        ░░    ░░▒▒",
+                    "    ░░░░░░▒▒          ░░▒▒░░▒▒",
+                    "      ░░▒▒                ░░▒▒",
+                    "        ░░▒▒  ░░░░░░░░  ░░▒▒  ",
+                    "          ░░░░░░░░░░░░░░░░    ",
+                    "        ░░░░░░░░██░░██░░░░░░  ",
+                    "        ▒▒░░░░░░░░░░░░░░░░▒▒  ",
+                    "      ░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░",
+                    "      ░░░░  ▒▒░░    ░░▒▒  ░░░░",
+                    "      ░░    ▒▒        ▒▒    ░░",
+                ]
+            }
+            "adult" => {
+                vec![
+                    "                ▒▒▒▒░░                      ",
+                    "          ░░▒▒░░▒▒▒▒░░░░                    ",
+                    "          ▒▒▒▒▒▒░░▒▒▓▓▓▓▓▓▓▓▒▒  ▓▓▒▒▒▒      ",
+                    "      ▒▒▒▒        ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░▒▒░░    ",
+                    "      ░░  ▒▒▒▒▒▒▓▓▓▓▓▓▓▓██▓▓▓▓▓▓░░░░░░  ▓▓  ",
+                    "      ▒▒▓▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓██▓▓████▓▓▒▒░░    ▒▒",
+                    "    ░░▓▓▓▓░░░░░░░░░░▓▓▓▓▓▓▓▓▓▓▓▓░░▒▒▒▒  ░░▒▒",
+                    "  ▓▓░░▓▓░░        ░░░░░░░░▒▒▒▒▒▒▓▓░░░░▓▓░░░░",
+                    "▒▒    ▒▒▒▒        ░░░░░░  ░░▒▒▓▓  ▓▓░░  ▒▒  ",
+                    "░░    ░░▒▒░░              ░░░░▒▒▒▒  ▓▓  ▓▓  ",
+                    "          ░░░░              ░░  ▒▒░░▓▓  ▒▒  ",
+                    "                              ░░▒▒░░▒▒  ▒▒  ",
+                    "                        ░░▒▒▓▓▓▓▒▒  ▒▒  ▒▒  ",
+                    "                  ░░░░░░▒▒▒▒▒▒░░░░▒▒    ░░  ",
+                    "                  ░░░░░░░░░░░░  ░░▒▒        ",
+                    "                  ░░░░░░░░    ░░▒▒          ",
+                ]
+            }
+            "elder" => {
+                vec![
+                    r"(\|) ._. (|/)"
+                ]
+            }
+            _ => {
+                vec![
+                    "／l、",
+                    "（ﾟ､ ｡ ７",
+                    "  l  ~ヽ",
+                    "      じしf_,)ノ",
+                ]
+            }
+        };
+        return text;
     }
 }
