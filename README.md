@@ -1,7 +1,7 @@
 # A Krabby-gotchi (via the terminal)
 
-(![terminal app preview](https://github.com/DrCheeseFace/Krabby-gotchi/blob/master/crab.JPG?raw=true))
-<p>her name is sally^</p>
+![terminal app preview](https://github.com/DrCheeseFace/Krabby-gotchi/blob/master/crab.JPG?raw=true)
+<p>her real name is sally^</p>
 
 
 ## What is this?
@@ -22,6 +22,16 @@ Learning rust.
 <br>
 Hopefully will have a terminal tamagotchi by the end because tamagotchis 
 are expensive and crabs are free if you are near an ocean.
+
+## Install
+<a href= "https://crates.io/crates/mrKrabs/1.1.0">Its on crate.io!</a>
+<br> 
+( I havnt figured out carge install yet so you have to cargo add it )
+
+``` 
+cargo add mrKrabs@=1.1.0
+```
+
 
 ## Dev
 Get Rust
