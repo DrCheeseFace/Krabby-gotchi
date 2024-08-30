@@ -14,7 +14,7 @@ mod tui;
 #[command(
     version,
     about,
-    long_about = "I bestow upon thee a (somewhat) friendly  crustacean"
+    long_about = "I bestow upon thee a (somewhat) friendly crustacean"
 )]
 struct Args {
     /// name the crab
