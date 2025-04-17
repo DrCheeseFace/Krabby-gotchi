@@ -26,10 +26,9 @@ are expensive and crabs are free if you are near an ocean.
 ## Install
 <a href= "https://crates.io/crates/mrKrabs/1.1.0">Its on crate.io!</a>
 <br> 
-( I havnt figured out carge install yet so you have to cargo add it )
 
 ``` 
-cargo add mrKrabs@=1.1.0
+cargo install mrKrabs@1.1.0
 ```
 
 
